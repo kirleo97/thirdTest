@@ -5,6 +5,10 @@ import java.util.Set;
 public class PeriodCounter {
     private static Set<LocalDate> holidays = new HashSet<>();
 
+    public static Set<LocalDate> getHolidays() {
+        return holidays;
+    }
+
     public static void addHoliday(LocalDate date) {
         holidays.add(date);
     }
@@ -27,11 +31,11 @@ public class PeriodCounter {
         LocalDate localDateForCount = localDate.plusDays(1);
         while (!localDateForCount.isEqual(newYearLocalDate)) {
             numberOfFullDays++;
-            if (isHoliday(localDateForCount))
+            if (DateChecker.isHoliday(localDateForCount))
                 numberOfHolidays++;
-            if (isWeekendDay(localDateForCount))
+            if (DateChecker.isWeekendDay(localDateForCount))
                 numberOfWeekends++;
-            if (isItBeforeHolidayWorkDay(localDateForCount))
+            if (DateChecker.isItBeforeHolidayWorkDay(localDateForCount))
                 numberOfBeforeHolidayWorkDays++;
             localDateForCount = localDateForCount.plusDays(1);
         }
@@ -45,49 +49,18 @@ public class PeriodCounter {
     public static int getWorkHoursForCurrentDay(LocalDateTime localDateTime) {
         int currentHour = localDateTime.getHour();
         LocalDate localDate = localDateTime.toLocalDate();
-        if (isHoliday(localDate) || isWeekendDay(localDate))
+        if (DateChecker.isHoliday(localDate) || DateChecker.isWeekendDay(localDate))
             return 0;
-        if (isItBeforeHolidayWorkDay(localDate)) {
-            if (isItHourBeforeDinnerOrDinnerHour(localDateTime))
+        if (DateChecker.isItBeforeHolidayWorkDay(localDate)) {
+            if (DateChecker.isItHourBeforeDinnerOrDinnerHour(localDateTime))
                 return 18 - currentHour - 1;
             else
                 return 18 - currentHour;
         } else {
-            if (isItHourBeforeDinnerOrDinnerHour(localDateTime))
+            if (DateChecker.isItHourBeforeDinnerOrDinnerHour(localDateTime))
                 return 19 - currentHour - 1;
             else
                 return 19 - currentHour;
         }
-    }
-
-
-    public static boolean isHoliday(LocalDate date) {
-        return holidays.contains(date);
-    }
-
-    public static boolean isWeekendDay(LocalDate date) {
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        return (dayOfWeek == DayOfWeek.SATURDAY) || (dayOfWeek == DayOfWeek.SUNDAY);
-    }
-
-    public static boolean isItHourBeforeDinnerOrDinnerHour(LocalDateTime localDateTime) {
-        return localDateTime.getHour() <= 14 ? true : false;
-    }
-
-    public static boolean isItBeforeHolidayWorkDay(LocalDate localDate) {
-        if (isWorkDay(localDate)) {
-            return (isHoliday(localDate.plusDays(1)) || (isHoliday(getNextMonday(localDate)) && localDate.getDayOfWeek() == DayOfWeek.FRIDAY));
-        }
-        return false;
-    }
-
-    public static boolean isWorkDay(LocalDate localDate) {
-        return !isWeekendDay(localDate) && !isHoliday(localDate);
-    }
-
-    public static LocalDate getNextMonday(LocalDate localDate) {
-        while (localDate.getDayOfWeek() != DayOfWeek.MONDAY)
-            localDate = localDate.plusDays(1);
-        return localDate;
     }
 }
