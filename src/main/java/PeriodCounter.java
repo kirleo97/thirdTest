@@ -120,7 +120,9 @@ public class PeriodCounter {
         return numberOfWeekendDays;
     }
 
-    public static int getQuarter(LocalDate localDate) {
+    public static int getQuarter(ZonedDateTime zonedDateTime) {
+        ZonedDateTime ourZonedDataTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Europe/Moscow"));
+        LocalDate localDate = ourZonedDataTime.toLocalDate();
         int month = localDate.getMonthValue();
         if (month >= 1 && month <= 3)
             return 1;
