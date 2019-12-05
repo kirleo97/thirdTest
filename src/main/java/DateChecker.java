@@ -1,6 +1,7 @@
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 public class DateChecker {
     public static boolean isHoliday(LocalDate date) {
@@ -18,7 +19,7 @@ public class DateChecker {
 
     public static boolean isItBeforeHolidayWorkDay(LocalDate localDate) {
         if (isWorkDay(localDate)) {
-            return (isHoliday(localDate.plusDays(1)) || (isHoliday(getNextMonday(localDate)) && localDate.getDayOfWeek() == DayOfWeek.FRIDAY));
+            return (isHoliday(localDate.plusDays(1)) || (isHoliday(PeriodCounter.getNextMonday(localDate)) && localDate.getDayOfWeek() == DayOfWeek.FRIDAY));
         }
         return false;
     }
@@ -27,9 +28,9 @@ public class DateChecker {
         return !isWeekendDay(localDate) && !isHoliday(localDate);
     }
 
-    public static LocalDate getNextMonday(LocalDate localDate) {
-        while (localDate.getDayOfWeek() != DayOfWeek.MONDAY)
-            localDate = localDate.plusDays(1);
-        return localDate;
+    public static boolean isDataInPeriod(LocalDate checkDate, LocalDate startDate, LocalDate endDate) {
+        Period betweenStartAndCheckDate = Period.between(startDate, checkDate);
+        Period betweenCheckAndEndDate = Period.between(checkDate, endDate);
+        return !betweenStartAndCheckDate.isNegative() && !betweenCheckAndEndDate.isNegative();
     }
 }
